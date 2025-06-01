@@ -2,14 +2,19 @@ from lib.models.author import Author
 from lib.models.magazine import Magazine
 from lib.models.article import Article
 
-alice = Author.create("Alice")
-bob = Author.create("Bob")
+def main():
+    alice = Author.create("Alice")
+    bob = Author.create("Bob")
 
-tt = Magazine.create("Tech Today", "Technology")
-hw = Magazine.create("Health Weekly", "Health")
+    tech_today = Magazine.create("Tech Today", "Technology")
+    health_weekly = Magazine.create("Health Weekly", "Health")
 
-alice.write_article("Quantum AI", "Quantum meets AI", tt)
-bob.write_article("Vitamins", "All about vitamins", hw)
+    # Pass full objects, not IDs
+    Article.create("Quantum AI", "Quantum meets AI", alice, tech_today)
+    Article.create("Vitamins", "All about vitamins", bob, health_weekly)
 
-print("Alice's magazines:", [m.name for m in alice.magazines()])
-print("Contributors to Tech Today:", [a.name for a in tt.contributors()])
+    print("Alice's magazines:", [m.name for m in alice.magazines()])
+    print("Contributors to Tech Today:", [a.name for a in tech_today.contributors])
+
+if __name__ == "__main__":
+    main()
