@@ -10,19 +10,22 @@ class Article:
 
     @classmethod
     def create(cls, title, content, author, magazine):
+        # Accepts Author and Magazine objects, not just IDs
+        author_id = author.id
+        magazine_id = magazine.id
+
         CURSOR.execute(
             "INSERT INTO articles (title, content, author_id, magazine_id) VALUES (?, ?, ?, ?)",
-            (title, content, author.id, magazine.id)
+            (title, content, author_id, magazine_id)
         )
         CONN.commit()
-        return cls(CURSOR.lastrowid, title, content, author.id, magazine.id)
+        return cls(CURSOR.lastrowid, title, content, author_id, magazine_id)
 
     @classmethod
     def find_by_author_id(cls, author_id):
         CURSOR.execute("SELECT * FROM articles WHERE author_id = ?", (author_id,))
         return [cls(*row) for row in CURSOR.fetchall()]
 
-    # Added find_by_title fix
     @classmethod
     def find_by_title(cls, title):
         CURSOR.execute("SELECT * FROM articles WHERE title = ?", (title,))

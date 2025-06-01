@@ -17,7 +17,6 @@ class Author:
         row = CURSOR.fetchone()
         return cls(*row) if row else None
 
-    # Added fix for missing find_by_name method
     @classmethod
     def find_by_name(cls, name):
         CURSOR.execute("SELECT * FROM authors WHERE name = ?", (name,))
@@ -29,14 +28,11 @@ class Author:
         CURSOR.execute("SELECT * FROM authors")
         return [cls(*row) for row in CURSOR.fetchall()]
 
-    # Added fix for missing top_author method
     @classmethod
     def top_author(cls):
-        from lib.models.article import Article
         authors = cls.all()
         if not authors:
             return None
-        # create dict with author as key and count of articles as value
         author_counts = {author: len(author.articles()) for author in authors}
         top = max(author_counts, key=author_counts.get)
         return top
@@ -46,7 +42,20 @@ class Author:
         CURSOR.execute("SELECT * FROM articles WHERE author_id = ?", (self.id,))
         return [Article(*row) for row in CURSOR.fetchall()]
 
-    # Added equality and hash for dictionary keys (used in top_author)
+    def magazines(self):
+        from lib.models.magazine import Magazine
+        CURSOR.execute(
+            """
+            SELECT DISTINCT magazines.id, magazines.name, magazines.category
+            FROM magazines
+            JOIN articles ON magazines.id = articles.magazine_id
+            WHERE articles.author_id = ?
+            """,
+            (self.id,)
+        )
+        rows = CURSOR.fetchall()
+        return [Magazine(*row) for row in rows]
+
     def __eq__(self, other):
         if isinstance(other, Author):
             return self.id == other.id
