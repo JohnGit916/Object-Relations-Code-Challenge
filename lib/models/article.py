@@ -1,7 +1,7 @@
 from lib.db.connection import CURSOR, CONN
 
 class Article:
-    def __init__(self, id, title, content, author_id, magazine_id):
+    def __init__(self, id=None, title=None, content=None, author_id=None, magazine_id=None):
         self.id = id
         self.title = title
         self.content = content
@@ -20,8 +20,14 @@ class Article:
     @classmethod
     def find_by_author_id(cls, author_id):
         CURSOR.execute("SELECT * FROM articles WHERE author_id = ?", (author_id,))
-        from lib.models.magazine import Magazine
         return [cls(*row) for row in CURSOR.fetchall()]
+
+    # Added find_by_title fix
+    @classmethod
+    def find_by_title(cls, title):
+        CURSOR.execute("SELECT * FROM articles WHERE title = ?", (title,))
+        row = CURSOR.fetchone()
+        return cls(*row) if row else None
 
     def magazine(self):
         from lib.models.magazine import Magazine
